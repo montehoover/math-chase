@@ -13,7 +13,8 @@ var stars;
 // loading images that will be added to the game as backgrounds
 // sprites, and physics objects
 function preload() {
-  game.load.image('sky', 'assets/sky.png');
+  // game.load.image('sky', 'assets/sky.png');
+  game.load.image('bg', 'assets/fence-background.png')
   game.load.image('ground', 'assets/platform.png');
   game.load.image('star', 'assets/star.png');
   // load a spritesheet, which takes a single image and splits it into
@@ -26,7 +27,7 @@ function preload() {
 function create() {
   // The game will use the ARCADE physics engine
   game.physics.startSystem(Phaser.Physics.ARCADE);
-  game.add.sprite(0,0, 'sky'); //background (starting from 0,0 - top left)
+  game.add.sprite(0,0, 'bg'); //background (starting from 0,0 - top left)
   platforms = game.add.group(); //creating a grouping of similar physics objects
   platforms.enableBody = true; //enable physics on all members of the group
   
