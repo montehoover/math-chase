@@ -20,8 +20,8 @@ function preload() {
   // load a spritesheet, which takes a single image and splits it into
   // frames 32px wide by 48px high (in an array)
   game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-  game.load.atlasJSONHash('robot', 'assets/robot-spritesheet.png', 
-    'assets/robot-sprite.json');
+  game.load.atlasJSONHash('robot', 'assets/robot-spritesheet-copy.png', 
+    'assets/robot-sprite-copy.json');
 }
 
 function create() {
@@ -59,7 +59,7 @@ function create() {
   robot.body.gravity.y = 300;
   robot.body.collideWorldBounds = true;
   robot.animations.add('running right', 
-    ['Run (1)', 'Run (2)', 'Run (3)', 'Run (4)', 'Run (5)', 'Run (6)', 'Run (7)', 'Run (8)'],
+    ['r-run0', 'r-run1', 'r-run2', 'r-run3', 'r-run4', 'r-run5', 'r-run6', 'r-run7'],
     10, true);
 
 
@@ -105,7 +105,7 @@ function update() {
     // stoped pressing the arrows.
     player.frame = 4; // What frame it should rest on when stopped.
     robot.animations.stop();
-    robot.frame = 'Idle (1)';
+    robot.frame = 'r-idle0';
   }
   // He jumps if both the up arrow is pushed AND he is touching a surface
   if (cursors.up.isDown && player.body.touching.down) {
