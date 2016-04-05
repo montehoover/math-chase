@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+}
+
+#div1 {
+  height: 50px;
+  width: 50px;
+  background-color: blue;
+}
+
+#div3 {
+  height: 50px;
+  width: 50px;
+  background-color: yellow;
+}
