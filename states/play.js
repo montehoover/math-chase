@@ -97,14 +97,17 @@ Play.prototype = {
     }
     if (this.cursors.up.isDown && this.robot.body.touching.down) {
       this.robot.body.velocity.y = -550;
-      console.log(this.robot.position, this.robot.body.width);
     }
 
-    // function collectStar (player, star) {
-    //   star.kill() // Remove sprite from game
-    //   this.score += 10;
-    //   this.scoreText.text = 'Score: ' + this.score;
-    // }
+    if (this.robot.position.x >= this.game.world.width - this.robot.body.width / 2) {
+      console.log("won");
+      game.state.start('menu', true, false, 'won');
+    }
+    if (this.robot.position.x <= 0 + this.robot.body.width / 2) {
+      console.log("lost");
+      game.state.start('menu', true, false, 'lost');
+    }
+
   },
 
   collectStar: function(player, star) {
