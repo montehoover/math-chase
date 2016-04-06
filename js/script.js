@@ -1,4 +1,3 @@
-
 var game = new Phaser.Game(1024, 512, Phaser.AUTO, 'div2', { preload: preload, create: create, update: update });
 var platforms;
 var player;
