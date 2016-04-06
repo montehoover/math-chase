@@ -1,17 +1,13 @@
 Menu = function(game) {
   this.game = game;
-  //console.log(status);
-  // this.status = status || '';
 }
 
 Menu.prototype.init = function(status) {
-  console.log(status, arguments);
   this.status = status || '';
 }
 
 Menu.prototype.create = function() {
   var message = ''
-  console.log(this.status);
   if (this.status == 'won') {
     message = 'You win!\nTap to play again';
   } else if (this.status == 'lost') {

@@ -2,7 +2,7 @@ Boot = function(game) {
   this.game = game;
 }
 
-Boot.prototype.create: function() {
+Boot.prototype.create = function() {
 
   // this.game.input.maxPointers = 1;
   
