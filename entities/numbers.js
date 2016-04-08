@@ -77,7 +77,7 @@ Numbers.prototype.createNumber = function(x, level) {
   n.body.allowGravity = false;
   n.scale.setTo(0.25, 0.25);
   n.checkWorldBounds = true;
-  n.events.onOutOfBounds.add(n.destroy, this);
+  n.events.onOutOfBounds.add(function(n) {n.destroy()}, this);
   n.body.velocity.x = this.game.rnd.integerInRange(-300, -100);
   n.value = frameDict[num];
 }
