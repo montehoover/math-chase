@@ -1,13 +1,18 @@
+// Play object class, which inherits from Phaser.State class
+
+// As an instance of Phaser.State, the Phaser.Game.StateManager
+// cleanly handles running the following state methods:
+// 1. .init()
+// 2. .preload()
+// 3. .create()
+// 4. .update()
+
 Play = function(game) {
   this.game = game;
-  // this.boy = new Player(game);
-  // this.girl = new Girl(game);
-  // this.bg = null;
-  // this.ground = null;
 
   this.platforms = null;
-  this.enemy = null;
-  this.player = null;
+  this.enemy = new Enemy(game);
+  this.player = new Player(game);
   this.cursors = null;
   this.score = 0;
   this.scoreText = null;
@@ -15,53 +20,36 @@ Play = function(game) {
   this.bg = null;
   this.ground = null;
   this.diamond = null;
+  this.numbers = new Numbers(game);
 }
 
+
+
 Play.prototype.create = function() {
-    
-    // this.bg = this.game.add.tileSprite(0, 0, 438, 136, 'background');
-    // this.ground = this.game.add.tileSprite(0, 125, 438, 44, 'ground');
-    // this.game.physics.arcade.enable(this.ground);
-    // this.ground.body.allowGravity = false;
-    // this.ground.body.immovable = true;
-    // this.ground.body.setSize(this.ground.width, this.ground.height - 10, 0, 10);
-    
-  this.game.physics.startSystem(Phaser.Physics.ARCADE);
-  this.game.input.maxPointers = 1;
-  this.bg = this.game.add.tileSprite(0, 0, 1024, 512, 'bg');
+  // Create background and static entities
+  this.bg = this.game.add.tileSprite(0, 0, 1024, 452, 'bg');
   this.ground = this.game.add.tileSprite(0, this.game.world.height - 60, 1024, 60, 'ground');
   this.game.physics.enable(this.ground);
   this.ground.body.immovable = true;
-  this.diamond = this.game.add.sprite(1000, this.game.world.height - 150, 'diamond');
-  this.game.physics.enable(this.diamond);
-  this.diamond.body.immovable = true;
-  this.diamond.body.velocity.x = -120;
-
-  // this.platforms = game.add.group(); //creating a grouping of similar physics objects
-  // this.platforms.enableBody = true; //enable physics on all members of the group
-  //var ground = this.platforms.create(0, game.world.height - 64, 'ground');
-
-  this.enemy = this.game.add.sprite(300, this.game.world.height - 150, 'enemy');
-  this.game.physics.enable(this.enemy);
-  this.enemy.body.bounce.y = 0.2;
-  this.enemy.body.gravity.y = 900;
-  this.enemy.body.collideWorldBounds = true;
-  this.enemy.anchor.setTo(0.5, 0.5);
-  this.enemy.body.setSize(82, 124);
-  this.enemy.animations.add('walking', 
-    ['r-run0', 'r-run1', 'r-run2', 'r-run3', 'r-run4', 'r-run5', 'r-run6', 'r-run7'],
-    10, true);
-
-  console.log(this.ground.body.height);
-  this.player = this.game.add.sprite(100, this.game.world.height - 150, 'player');
-  this.game.physics.enable(this.player);
-  this.player.body.bounce.y = 0.2;
-  this.player.body.gravity.y = 900;
-  this.player.body.collideWorldBounds = true;
-  this.player.scale.setTo(0.25, 0.25);
+  this.ground.body.allowGravity = false;
+  // Raise physics body of ground by 20px so the players appear higher off it.
+  this.ground.body.setSize(this.ground.width, this.ground.height + 20, 0, -20);
 
 
+  // Create main character entities
+  this.player.create();
+  this.enemy.create();
 
+
+  // Create small game entities
+  this.numbers.create()
+  var n = this.numbers.group.create(this.enemy.sprite.position.x, this.enemy.sprite.position.y, 'numbers', 'one');
+  n.body.allowGravity = false;
+  n.scale.setTo(0.25, 0.25);
+  n.checkWorldBounds = true;
+  n.events.onOutOfBounds.add(this.numberRecycle, this);
+  n.value = this.numbers.frameDict['one'];
+  n.body.velocity.x = this.game.rnd.integerInRange(-300, -100);
 
 
   this.stars = this.game.add.group();
@@ -72,50 +60,52 @@ Play.prototype.create = function() {
     star.body.bounce.y = 0.7 + Math.random() * 0.2;
   }
 
-  
-  this.cursors = this.game.input.keyboard.createCursorKeys();
-  this.scoreText = this.game.add.text(16, 16, 'score: 0', {fontSize: '32px', 
-    fill: '#000'});
+  this.scoreText = this.game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
 }
+
+
 
 Play.prototype.update = function() {
   this.bg.tilePosition.x -= 2;
   this.ground.tilePosition.x -=2;
-  this.game.physics.arcade.collide(this.enemy, this.ground);
+  this.game.physics.arcade.collide(this.player.sprite, this.ground);
+  this.game.physics.arcade.collide(this.enemy.sprite, this.ground);
   this.game.physics.arcade.collide(this.stars, this.ground);
-  this.game.physics.arcade.collide(this.diamond, this.enemy);
-  this.game.physics.arcade.overlap(this.enemy, this.stars, this.collectStar, null, this);
+  this.game.physics.arcade.collide(this.diamond, this.enemy.sprite);
+  this.game.physics.arcade.overlap(this.enemy.sprite, this.stars, this.collectStar, null, this);
+  this.game.physics.arcade.overlap(this.player.sprite, this.enemy.sprite, this.winGame, null, this);
+  this.game.physics.arcade.overlap(this.player.sprite, this.numbers.group, this.collectNumber, null, this);
 
-  this.enemy.body.velocity.x = 0;
-  this.enemy.animations.play('walking');
 
-  
-  if (this.cursors.left.isDown) {
-    this.enemy.scale.x = -1;
-    //this.robot.animations.play('walking');
-    this.enemy.body.velocity.x = -250;
-  } else if (this.cursors.right.isDown) {
-    this.enemy.body.velocity.x = 250;
-    this.enemy.scale.x = 1;
-    //this.robot.animations.play('walking');
-  } else {
-    //this.robot.animations.play('walking');
-    // robot.animations.stop();
-    // robot.frameName = 'r-idle0';
-  }
-  if (this.cursors.up.isDown && this.enemy.body.touching.down) {
-    this.enemy.body.velocity.y = -550;
-  }
-
-  if (this.enemy.position.x >= this.game.world.width - this.enemy.body.width / 2) {
-    console.log("won");
-    game.state.start('menu', true, false, 'won');
-  }
-  if (this.enemy.position.x <= 0 + this.enemy.body.width / 2) {
+  if (this.enemy.sprite.position.x >= this.game.world.width - this.enemy.sprite.body.width) {
     console.log("lost");
     game.state.start('menu', true, false, 'lost');
   }
 
+  this.player.update()
+  this.enemy.update()
+}
+
+
+
+Play.prototype.numberRecycle = function(n) {
+  n.frame = 'ten'      
+  n.reset(this.enemy.sprite.position.x, this.enemy.sprite.position.y);
+  n.body.velocity.x = this.game.rnd.integerInRange(-300, -100); 
+}
+
+
+Play.prototype.winGame = function(player, enemy) {
+  game.state.start('menu', true, false, 'won');
+}
+
+Play.prototype.collectNumber = function(player, n) {
+  // this.hurtSound.play();
+  n.kill();
+  this.numberRecycle(n);
+  // this.wrongLetters.push(this.alph.splice(alphElement, 1));
+  // this.deathCounter++;
+  // this.counterMessage.setText('Wrong Letters: ' + this.deathCounter);
 }
 
 Play.prototype.collectStar = function(player, star) {

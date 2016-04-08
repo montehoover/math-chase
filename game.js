@@ -1,4 +1,13 @@
-// var game = new Phaser.Game(438, 160, Phaser.CANVAS);
+// Runs a new game of Math Chase
+
+// As an instance of Phaser.Game, it has a 'state' attribute
+// that stores Phaser.State objects and handles cleanly running
+// the following state methods:
+// 1. .init()
+// 2. .preload()
+// 3. .create()
+// 4. .update()
+
 var game = new Phaser.Game(1024, 512, Phaser.AUTO, 'div2');
 
 

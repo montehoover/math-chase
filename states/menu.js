@@ -1,3 +1,12 @@
+// Menu object class, which inherits from Phaser.State class
+
+// As an instance of Phaser.State, the Phaser.Game.StateManager
+// cleanly handles running the following state methods:
+// 1. .init()
+// 2. .preload()
+// 3. .create()
+// 4. .update()
+
 Menu = function(game) {
   this.game = game;
 }
