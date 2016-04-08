@@ -13,7 +13,7 @@ Background.prototype.create = function() {
   this.ground.body.immovable = true;
   this.ground.body.allowGravity = false;
   // Raise physics body of ground by 20px so the players appear higher off it.
-  this.ground.body.setSize(this.ground.width, this.ground.height + 20, 0, -20);
+  this.ground.body.setSize(this.ground.width, this.ground.height + 25, 0, -25);
 }
 
 

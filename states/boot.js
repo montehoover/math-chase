@@ -22,7 +22,7 @@ Boot.prototype.create = function() {
   // this.scale.setScreenSize(true);
 
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
-  this.game.physics.arcade.gravity.y = 300;
+  // this.game.physics.arcade.gravity.y = 300;
   this.game.input.maxPointers = 1;
 
   this.game.state.start('load');

@@ -21,9 +21,10 @@ Play = function(game) {
   this.levels = {};
 }
 
-
+var targetReached;
 
 Play.prototype.create = function() {
+  targetReached = false;
   this.levels = {
     current: 1,
     goals: {
@@ -43,16 +44,16 @@ Play.prototype.create = function() {
 
   // Create small game entities
   this.numbers.create();
-  this.game.time.events.loop(Phaser.Timer.SECOND * 0.5, newNum, this);
+  this.game.time.events.loop(Phaser.Timer.SECOND, newNum, this);
   function newNum() {
     this.numbers.createNumber(this.enemy.sprite.x, this.levels.current);
   }
 
   var style = {fontSize: '32px', fill: '#000'};
   this.levelText = this.game.add.text(16, 16, 'Level: ' + this.levels.current, style);
-  this.goalText = this.game.add.text(300, 16, 'Target Speed: ' + this.levels.goals[this.levels.current], style);
-  this.speedText = this.game.add.text(16, 60, 'Current Speed:' + this.numbers.numCount, style);
-  this.messageText = this.game.add.text(600, 16, 'Catch the robot!', style);
+  this.goalText = this.game.add.text(16, 60, 'Target: ' + this.levels.goals[this.levels.current], style);
+  this.speedText = this.game.add.text(16, 104, 'Current Count:' + this.numbers.numCount, style);
+  this.messageText = this.game.add.text(300, 16, 'Catch the robot!', style);
 }
 
 
@@ -60,15 +61,13 @@ Play.prototype.create = function() {
 Play.prototype.update = function() {
   this.game.physics.arcade.collide(this.player.sprite, this.background.ground);
   this.game.physics.arcade.collide(this.enemy.sprite, this.background.ground);
-  this.game.physics.arcade.overlap(this.player.sprite, this.enemy.sprite, winGame, null, this);
-  this.game.physics.arcade.overlap(this.player.sprite, this.numbers.group, collectNumber, null, this);
+  this.game.physics.arcade.collide(this.player.sprite, this.enemy.sprite, checkWin, null, this);
+  if (!targetReached) {
+    this.game.physics.arcade.overlap(this.player.sprite, this.numbers.group, collectNumber, null, this);
+  }
 
   this.player.update()
   this.enemy.update()
-
-  if (this.numbers.numCount = this.levels.goals[this.levels.current]) {
-    this.player.sprite.body.velocity.x += 100;
-  }
 
   if (this.enemy.sprite.position.x >= this.game.world.width - this.enemy.sprite.body.width) {
     console.log("lost");
@@ -76,18 +75,24 @@ Play.prototype.update = function() {
   }
 }
 
-var winGame = function(player, enemy) {
-  this.levels.current += 1;
-  game.state.start('menu', true, false, 'won');
+var checkWin = function(player, enemy) {
+  if (targetReached) {
+    this.levels.current += 1;
+    game.state.start('menu', true, false, 'won');
+  } else {
+    this.messageText.text = 'The robot is too big! Get more numbers.'
+  }
 }
 
 var collectNumber = function(player, number) {
   this.numbers.collectNumber(player, number);
   this.speedText.text = 'Current Speed:' + this.numbers.numCount;
-  if (this.numbers.numCount = this.levels.goals[this.levels.current]) {
-    this.player.sprite.body.velocity.x += 100;
+  if (this.numbers.numCount === this.levels.goals[this.levels.current]) {
+    targetReached = true; 
+    this.player.getEnemy()
+    this.player.sprite.body.velocity.x += 400;
   } else if (this.numbers.numCount > this.levels.goals[this.levels.current]) {
-    this.player.sprite.body.velocity.x += 100;
-    this.messageText.text = 'Ouch, you went too fast!';
+    this.player.punish();
+    this.messageText.text = 'Ouch, you went over the target!';
   }
 }

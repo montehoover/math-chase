@@ -2,7 +2,7 @@ Numbers = function(game) {
     
     this.game = game;
     this.group = null;
-    this.numCount = 1;
+    this.numCount = null;
 };
 
 var frameArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'n-one', 'half']
@@ -24,34 +24,10 @@ var frameDict = {
   'half'  : 0.5
 }
 
-Numbers.prototype.create = function() {
-        
+Numbers.prototype.create = function() {   
   this.group = this.game.add.group();
   this.group.enableBody = true;
-
-  this.levelText 
-  this.targetText
-  this.speedText = this.game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
-  this.messageText
-
-  
-  // this.createLetter(game.world.height - 107);
-  // this.createLetter(game.world.height - 85);
-  // this.createLetter(game.world.height - 53);
-  
-  // // Timed function that will create a new letter on the x-axis every 30 seconds
-  // this.game.time.events.add(Phaser.Timer.SECOND * 30, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 60, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 90, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 120, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 150, this.createLetter, this, 185); // Add another horizontal one
-  // this.game.time.events.add(Phaser.Timer.SECOND * 180, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 210, this.createLetterTop, this);
-  // this.game.time.events.add(Phaser.Timer.SECOND * 240, this.createLetterTop, this);
-  
-  // // Our player death counter (will replace with hangman later)
-  // var style = {font: "20px Frijole", fill: "#FFFFFF"};
-  // this.counterMessage = this.game.add.text(0.5, 0.5, 'Wrong Letters: ' + this.deathCounter, style);
+  this.numCount = 1;
   
   // // Audio
   // this.hurtSound = this.game.add.audio('hurt');
@@ -64,11 +40,6 @@ Numbers.prototype.create = function() {
 
 }
 
-    
-// Numbers.prototype.update = function() {      
-//   this.game.physics.arcade.overlap(this.game.player.sprite, this.group, this.collectNumber, null, this);
-// }
-
 
 Numbers.prototype.createNumber = function(x, level) {
   // Get a random number for the number bubble based on the current level.
@@ -80,12 +51,17 @@ Numbers.prototype.createNumber = function(x, level) {
   n.events.onOutOfBounds.add(function(n) {n.destroy()}, this);
   n.body.velocity.x = this.game.rnd.integerInRange(-300, -100);
   n.value = frameDict[num];
+  console.log('created ' + n.value);
 }
 
 
 Numbers.prototype.collectNumber = function(player, n) {
   // this.hurtSound.play();
+  console.log('collected ', n.value);
+  console.log('numcount ', this.numCount);
+  console.log('sum ', this.numCount + n.value);
   this.numCount += n.value;
+  console.log('new numcount ', this.numCount)
   n.destroy();
   //this.numberRecycle(n);
 }
