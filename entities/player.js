@@ -10,6 +10,7 @@ Player.prototype.create = function() {
   this.sprite.scale.setTo(0.25, 0.25);
   this.game.physics.arcade.enable(this.sprite);
   this.sprite.body.collideWorldBounds = true;
+  this.sprite.body.gravity.y = 900;
   this.sprite.body.bounce.y = 0.2;
   this.sprite.body.bounce.x = 0.2;
   this.sprite.body.setSize(290, 400);

@@ -10,106 +10,84 @@
 Play = function(game) {
   this.game = game;
 
-  this.platforms = null;
+  this.background = new Background(game);
   this.enemy = new Enemy(game);
   this.player = new Player(game);
-  this.cursors = null;
-  this.score = 0;
-  this.scoreText = null;
-  this.stars = null;
-  this.bg = null;
-  this.ground = null;
-  this.diamond = null;
   this.numbers = new Numbers(game);
+  this.levelText = null;
+  this.goalText = null;
+  this.speedText = null;
+  this.messageText = null;
+  this.levels = {};
 }
 
 
 
 Play.prototype.create = function() {
-  // Create background and static entities
-  this.bg = this.game.add.tileSprite(0, 0, 1024, 452, 'bg');
-  this.ground = this.game.add.tileSprite(0, this.game.world.height - 60, 1024, 60, 'ground');
-  this.game.physics.enable(this.ground);
-  this.ground.body.immovable = true;
-  this.ground.body.allowGravity = false;
-  // Raise physics body of ground by 20px so the players appear higher off it.
-  this.ground.body.setSize(this.ground.width, this.ground.height + 20, 0, -20);
+  this.levels = {
+    current: 1,
+    goals: {
+      1: 10,
+      2: 22,
+      3: 33,
+      4: 48
+    }
+  };
 
+  // Create background and static entities
+  this.background.create()
 
   // Create main character entities
   this.player.create();
   this.enemy.create();
 
-
   // Create small game entities
-  this.numbers.create()
-  var n = this.numbers.group.create(this.enemy.sprite.position.x, this.enemy.sprite.position.y, 'numbers', 'one');
-  n.body.allowGravity = false;
-  n.scale.setTo(0.25, 0.25);
-  n.checkWorldBounds = true;
-  n.events.onOutOfBounds.add(this.numberRecycle, this);
-  n.value = this.numbers.frameDict['one'];
-  n.body.velocity.x = this.game.rnd.integerInRange(-300, -100);
-
-
-  this.stars = this.game.add.group();
-  this.stars.enableBody = true;
-  for (var i = 0; i < 12; i++){
-    var star = this.stars.create(i*70, 0, 'star');
-    star.body.gravity.y = 6;
-    star.body.bounce.y = 0.7 + Math.random() * 0.2;
+  this.numbers.create();
+  this.game.time.events.loop(Phaser.Timer.SECOND * 0.5, newNum, this);
+  function newNum() {
+    this.numbers.createNumber(this.enemy.sprite.x, this.levels.current);
   }
 
-  this.scoreText = this.game.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+  var style = {fontSize: '32px', fill: '#000'};
+  this.levelText = this.game.add.text(16, 16, 'Level: ' + this.levels.current, style);
+  this.goalText = this.game.add.text(300, 16, 'Target Speed: ' + this.levels.goals[this.levels.current], style);
+  this.speedText = this.game.add.text(16, 60, 'Current Speed:' + this.numbers.numCount, style);
+  this.messageText = this.game.add.text(600, 16, 'Catch the robot!', style);
 }
 
 
 
 Play.prototype.update = function() {
-  this.bg.tilePosition.x -= 2;
-  this.ground.tilePosition.x -=2;
-  this.game.physics.arcade.collide(this.player.sprite, this.ground);
-  this.game.physics.arcade.collide(this.enemy.sprite, this.ground);
-  this.game.physics.arcade.collide(this.stars, this.ground);
-  this.game.physics.arcade.collide(this.diamond, this.enemy.sprite);
-  this.game.physics.arcade.overlap(this.enemy.sprite, this.stars, this.collectStar, null, this);
-  this.game.physics.arcade.overlap(this.player.sprite, this.enemy.sprite, this.winGame, null, this);
-  this.game.physics.arcade.overlap(this.player.sprite, this.numbers.group, this.collectNumber, null, this);
+  this.game.physics.arcade.collide(this.player.sprite, this.background.ground);
+  this.game.physics.arcade.collide(this.enemy.sprite, this.background.ground);
+  this.game.physics.arcade.overlap(this.player.sprite, this.enemy.sprite, winGame, null, this);
+  this.game.physics.arcade.overlap(this.player.sprite, this.numbers.group, collectNumber, null, this);
 
+  this.player.update()
+  this.enemy.update()
+
+  if (this.numbers.numCount = this.levels.goals[this.levels.current]) {
+    this.player.sprite.body.velocity.x += 100;
+  }
 
   if (this.enemy.sprite.position.x >= this.game.world.width - this.enemy.sprite.body.width) {
     console.log("lost");
     game.state.start('menu', true, false, 'lost');
   }
-
-  this.player.update()
-  this.enemy.update()
 }
 
-
-
-Play.prototype.numberRecycle = function(n) {
-  n.frame = 'ten'      
-  n.reset(this.enemy.sprite.position.x, this.enemy.sprite.position.y);
-  n.body.velocity.x = this.game.rnd.integerInRange(-300, -100); 
-}
-
-
-Play.prototype.winGame = function(player, enemy) {
+var winGame = function(player, enemy) {
+  this.levels.current += 1;
   game.state.start('menu', true, false, 'won');
 }
 
-Play.prototype.collectNumber = function(player, n) {
-  // this.hurtSound.play();
-  n.kill();
-  this.numberRecycle(n);
-  // this.wrongLetters.push(this.alph.splice(alphElement, 1));
-  // this.deathCounter++;
-  // this.counterMessage.setText('Wrong Letters: ' + this.deathCounter);
-}
-
-Play.prototype.collectStar = function(player, star) {
-    star.kill() // Remove sprite from game
-    this.score += 10;
-    this.scoreText.text = 'Score: ' + this.score;
+var collectNumber = function(player, number) {
+  this.numbers.collectNumber(player, number);
+  this.speedText.text = 'Current Speed:' + this.numbers.numCount;
+  if (this.numbers.numCount = this.levels.goals[this.levels.current]) {
+    this.player.sprite.body.velocity.x += 100;
+  } else if (this.numbers.numCount > this.levels.goals[this.levels.current]) {
+    this.player.sprite.body.velocity.x += 100;
+    this.messageText.text = 'Ouch, you went too fast!';
+  }
 }
