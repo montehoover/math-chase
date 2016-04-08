@@ -53,7 +53,7 @@ Play.prototype.create = function() {
   this.levelText = this.game.add.text(16, 16, 'Level: ' + levels.current, style);
   this.goalText = this.game.add.text(16, 60, 'Target: ' + levels.goals[levels.current], style);
   this.speedText = this.game.add.text(16, 104, 'Current Count:' + this.numbers.numCount, style);
-  this.messageText = this.game.add.text(300, 16, 'Catch the robot!', style);
+  this.messageText = this.game.add.text(300, 16, 'Collect numbers and catch the robot!', style);
 }
 
 
@@ -86,7 +86,7 @@ var checkWin = function(player, enemy) {
 
 var collectNumber = function(player, number) {
   this.numbers.collectNumber(player, number);
-  this.speedText.text = 'Current Speed:' + this.numbers.numCount;
+  this.speedText.text = 'Current Count:' + this.numbers.numCount;
   if (this.numbers.numCount === levels.goals[levels.current]) {
     targetReached = true; 
     this.player.getEnemy()

@@ -16,9 +16,9 @@ Boot.prototype.constructor = Boot;
 
 
 Boot.prototype.create = function() {
-  // this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-  // this.scale.pageAlignHorizontally = true;
-  // this.scale.pageAlignVertically = true;
+  this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+  this.scale.pageAlignHorizontally = true;
+  this.scale.pageAlignVertically = true;
   // this.scale.setScreenSize(true);
 
   this.game.physics.startSystem(Phaser.Physics.ARCADE);
